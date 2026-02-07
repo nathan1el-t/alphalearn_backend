@@ -21,13 +21,16 @@ public class Profile {
 
     // Getters
 
-    public UUID getId(){
+    public UUID getId() {
         return id;
     }
 
-    public String getUsername(){
+    public String getUsername() {
         return username;
     }
 
-    // No Setters.
+    // Setters
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }
