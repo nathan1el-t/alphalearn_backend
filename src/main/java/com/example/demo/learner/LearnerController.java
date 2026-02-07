@@ -1,4 +1,4 @@
-package com.example.demo.learners;
+package com.example.demo.learner;
 
 import java.util.List;
 
