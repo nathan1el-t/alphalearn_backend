@@ -14,8 +14,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @JsonIgnoreProperties({"profile"}) //temporary fix to prevent loop, to review in the future
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "lesson_enrollments")
 public class LessonEnrollment {
@@ -23,6 +29,7 @@ public class LessonEnrollment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "enrollment_id")
+    @Setter(lombok.AccessLevel.NONE)
     private Integer enrollmentId;
 
     @ManyToOne(optional = false)
@@ -38,44 +45,4 @@ public class LessonEnrollment {
 
     @Column(name = "first_completed_at")
     private OffsetDateTime firstCompletedAt;
-
-    // Getters
-
-    public Integer getEnrollmentId() {
-        return enrollmentId;
-    }
-
-    public Learner getLearner() {
-        return learner;
-    }
-
-    public Lesson getLesson() {
-        return lesson;
-    }
-
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public OffsetDateTime getFirstCompletedAt() {
-        return firstCompletedAt;
-    }
-
-    // Setters
-
-    public void setLearner(Learner learner) {
-        this.learner = learner;
-    }
-
-    public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
-
-    public void setFirstCompletedAt(OffsetDateTime firstCompletedAt) {
-        this.firstCompletedAt = firstCompletedAt;
-    }
 }

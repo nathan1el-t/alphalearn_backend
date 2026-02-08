@@ -12,12 +12,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @JsonIgnoreProperties("profile") //temporary fix to prevent loop, to review in the future
+@Getter
+@NoArgsConstructor
 @Entity
 @Table(name = "learners")
 public class Learner {
-    
+
     @Id
     @Column(name = "learner_id", columnDefinition = "uuid")
     private UUID learnerId;
@@ -27,26 +32,7 @@ public class Learner {
     @JoinColumn(name = "learner_id")
     private Profile profile;
 
+    @Setter
     @Column(name = "total_points", nullable = false)
     private short totalPoints;
-
-    // Getters
-
-    public UUID getLearnerId() {
-        return learnerId;
-    }
-
-    public Profile getProfile() {
-        return profile;
-    }
-
-    public short getTotalPoints() {
-        return totalPoints;
-    }
-
-    // Setters
-
-    public void setTotalPoints(short totalPoints) {
-        this.totalPoints = totalPoints;
-    }
 }

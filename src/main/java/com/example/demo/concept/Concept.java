@@ -8,7 +8,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "concepts")
 public class Concept {
@@ -16,6 +22,7 @@ public class Concept {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "concept_id")
+    @Setter(lombok.AccessLevel.NONE)
     private Integer conceptId;
 
     @Column(nullable = false)
@@ -31,44 +38,4 @@ public class Concept {
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
-
-    // Getters
-
-    public Integer getConceptId() {
-        return conceptId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getModerationStatus() {
-        return moderationStatus;
-    }
-
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    // Setters
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setModerationStatus(String moderationStatus) {
-        this.moderationStatus = moderationStatus;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }

@@ -11,13 +11,20 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @JsonIgnoreProperties({"profile"})
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "lesson_concepts")
 public class LessonConcept {
 
     @EmbeddedId
+    @Setter(lombok.AccessLevel.NONE)
     private LessonConceptId id;
 
     @ManyToOne
@@ -32,37 +39,4 @@ public class LessonConcept {
 
     @Column(name = "display_order", nullable = false)
     private short displayOrder;
-
-    // Getters
-
-    public LessonConceptId getId() {
-        return id;
-    }
-
-    public Lesson getLesson() {
-        return lesson;
-    }
-
-    public Concept getConcept() {
-        return concept;
-    }
-
-    public short getDisplayOrder() {
-        return displayOrder;
-    }
-
-    // Setters
-
-    public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
-    }
-
-    public void setConcept(Concept concept) {
-        this.concept = concept;
-    }
-
-    public void setDisplayOrder(short displayOrder) {
-        this.displayOrder = displayOrder;
-    }
 }
-
