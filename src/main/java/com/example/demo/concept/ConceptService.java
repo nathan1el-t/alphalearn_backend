@@ -13,6 +13,7 @@ public class ConceptService {
         this.repository = repository;
     }
 
+    // Get all cocncepts
     public List<ConceptDTO> getAllConcepts() {
         return repository.findAll()
                 .stream()
@@ -24,5 +25,19 @@ public class ConceptService {
                         concept.getCreatedAt()
                 ))
                 .toList();
+    }
+
+    // Get concept by ID
+    public ConceptDTO getConceptById(Integer id) {
+        Concept concept = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Concept not found with id: " + id));
+
+        return new ConceptDTO(
+                concept.getConceptId(),
+                concept.getTitle(),
+                concept.getDescription(),
+                concept.getModerationStatus(),
+                concept.getCreatedAt()
+        );
     }
 }
