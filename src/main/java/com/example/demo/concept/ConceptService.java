@@ -13,7 +13,16 @@ public class ConceptService {
         this.repository = repository;
     }
 
-    public List<Concept> getAllConcepts() {
-        return repository.findAll();
+    public List<ConceptDTO> getAllConcepts() {
+        return repository.findAll()
+                .stream()
+                .map(concept -> new ConceptDTO(
+                        concept.getConceptId(),
+                        concept.getTitle(),
+                        concept.getDescription(),
+                        concept.getModerationStatus(),
+                        concept.getCreatedAt()
+                ))
+                .toList();
     }
 }

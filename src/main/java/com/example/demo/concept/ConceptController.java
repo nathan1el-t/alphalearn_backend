@@ -17,7 +17,7 @@ public class ConceptController {
     }
 
     @GetMapping
-    public List<Concept> getConcepts() {
+    public List<ConceptDTO> getConcepts() {
         return service.getAllConcepts();
     }
 }
