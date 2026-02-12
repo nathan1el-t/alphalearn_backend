@@ -61,4 +61,26 @@ public class ConceptService {
                 savedConcept.getCreatedAt()
         );
     }
+
+    // Update existing concept
+    public ConceptDTO updateConcept(Integer id, Concept updatedConcept) {
+
+        Concept existing = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Concept not found"));
+
+        // Update allowed fields only
+        existing.setTitle(updatedConcept.getTitle());
+        existing.setDescription(updatedConcept.getDescription());
+        existing.setModerationStatus(updatedConcept.getModerationStatus());
+
+        Concept saved = repository.save(existing);
+
+        return new ConceptDTO(
+                saved.getConceptId(),
+                saved.getTitle(),
+                saved.getDescription(),
+                saved.getModerationStatus().name(),
+                saved.getCreatedAt()
+        );
+    }
 }
