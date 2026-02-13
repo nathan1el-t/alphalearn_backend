@@ -2,6 +2,8 @@ package com.example.demo.concept;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,6 +42,7 @@ public class ConceptController {
 
     /**
      * Post new concept
+     * The json body should NOT contain fields: moderationStatus, createdAt, and conceptId.
      */
     @PostMapping
     public ConceptDTO createConcept(@RequestBody Concept concept) {
@@ -55,6 +58,15 @@ public class ConceptController {
             @RequestBody Concept updatedConcept) {
 
         return service.updateConcept(id, updatedConcept);
+    }
+
+    /**
+     * Delete concept by ID
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteConcept(@PathVariable Integer id) {
+        service.deleteConcept(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

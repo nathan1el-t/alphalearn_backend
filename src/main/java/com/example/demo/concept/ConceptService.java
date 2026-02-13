@@ -83,4 +83,13 @@ public class ConceptService {
                 saved.getCreatedAt()
         );
     }
+
+    // Delete concept by ID
+    public void deleteConcept(Integer id) {
+
+        Concept concept = repository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Concept not found with id: " + id));
+
+        repository.delete(concept);
+    }
 }
