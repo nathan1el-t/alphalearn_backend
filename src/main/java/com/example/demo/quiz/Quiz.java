@@ -1,8 +1,8 @@
 package com.example.demo.quiz;
 
 import com.example.demo.lesson.Lesson;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,13 +23,14 @@ import lombok.NoArgsConstructor;
 public class Quiz {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "quiz_id")
     private Integer quizId;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "lesson_id", nullable = false)
     private Lesson lessonId;    
 
-    //Add createdAt row in database
+    //Should Add createdAt row in database
     // @Column(name = "created_at", nullable = false)
     // private OffsetDateTime createdAt;
 }
