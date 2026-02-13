@@ -23,4 +23,15 @@ public class QuizQuestionService {
                     quizQuestion.getCorrectAnswer()
                 )).toList();
     }
+
+    public QuizQuestionResponseDTO getQuestionById(Integer id){
+        QuizQuestion quizQuestion = quizQuestionRepository.findById(id).orElseThrow(() -> new RuntimeException("Quiz Question not found"));
+        return new QuizQuestionResponseDTO(
+            quizQuestion.getQuestionId(),
+            quizQuestion.getQuizId().getQuizId(),
+            quizQuestion.getQuestionText(),
+            quizQuestion.getQuizQuestionType(),
+            quizQuestion.getCorrectAnswer()
+        );
+    }
 }

@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 public class QuizQuestion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "question_id")
     private Integer questionId;
 
     @Column(name = "question_text")
