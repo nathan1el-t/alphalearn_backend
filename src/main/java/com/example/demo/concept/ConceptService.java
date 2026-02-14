@@ -8,15 +8,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class ConceptService {
 
-    private final ConceptRepository repository;
+    private final ConceptRepository conceptRepository;
 
-    public ConceptService(ConceptRepository repository) {
-        this.repository = repository;
+    public ConceptService(ConceptRepository conceptRepository) {
+        this.conceptRepository = conceptRepository;
     }
 
     // Get all cocncepts
     public List<ConceptDTO> getAllConcepts() {
-        return repository.findAll()
+        return conceptRepository.findAll()
                 .stream()
                 .map(concept -> new ConceptDTO(
                         concept.getConceptId(),
@@ -30,7 +30,7 @@ public class ConceptService {
 
     // Get concept by ID
     public ConceptDTO getConceptById(Integer id) {
-        Concept concept = repository.findById(id)
+        Concept concept = conceptRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Concept not found with id: " + id));
 
         return new ConceptDTO(
@@ -51,7 +51,7 @@ public class ConceptService {
 
         System.out.println(concept.getModerationStatus().getClass());
 
-        Concept savedConcept = repository.save(concept);
+        Concept savedConcept = conceptRepository.save(concept);
 
         return new ConceptDTO(
                 savedConcept.getConceptId(),
@@ -65,7 +65,7 @@ public class ConceptService {
     // Update existing concept
     public ConceptDTO updateConcept(Integer id, Concept updatedConcept) {
 
-        Concept existing = repository.findById(id)
+        Concept existing = conceptRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Concept not found"));
 
         // Update allowed fields only
@@ -73,7 +73,7 @@ public class ConceptService {
         existing.setDescription(updatedConcept.getDescription());
         existing.setModerationStatus(updatedConcept.getModerationStatus());
 
-        Concept saved = repository.save(existing);
+        Concept saved = conceptRepository.save(existing);
 
         return new ConceptDTO(
                 saved.getConceptId(),
@@ -87,9 +87,9 @@ public class ConceptService {
     // Delete concept by ID
     public void deleteConcept(Integer id) {
 
-        Concept concept = repository.findById(id)
+        Concept concept = conceptRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("Concept not found with id: " + id));
 
-        repository.delete(concept);
+        conceptRepository.delete(concept);
     }
 }
