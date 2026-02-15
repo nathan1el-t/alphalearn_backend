@@ -1,5 +1,8 @@
 package com.example.demo.quizquestion;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.example.demo.quiz.Quiz;
 import com.example.demo.quizquestion.enums.QuizQuestionType;
 
@@ -13,13 +16,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "quiz_questions")
 public class QuizQuestion {
@@ -32,6 +33,7 @@ public class QuizQuestion {
     private String questionText;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "question_type")
     private QuizQuestionType quizQuestionType;
 
@@ -40,5 +42,12 @@ public class QuizQuestion {
 
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false)
-    private Quiz quizId;   
+    private Quiz quiz;   
+
+    public QuizQuestion(String questionText, QuizQuestionType quizQuestionType, String correctAnswer, Quiz quiz){
+        this.questionText = questionText;
+        this.quizQuestionType = quizQuestionType;
+        this.correctAnswer = correctAnswer;
+        this.quiz = quiz;
+    }
 }

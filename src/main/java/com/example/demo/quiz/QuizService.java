@@ -23,7 +23,11 @@ public class QuizService {
         return quizRepository.findAll().stream().map(quiz -> new QuizResponseDTO(quiz.getQuizId(),quiz.getLesson().getLessonId())).toList();
     }
 
-    public QuizResponseDTO getQuizById(Integer id) {
+    public Quiz getQuizById(Integer id){
+        return quizRepository.findById(id).orElseThrow(() -> new RuntimeException("Quiz not found"));
+    }
+
+    public QuizResponseDTO getQuizByIdDTO(Integer id) {
         Quiz quiz = quizRepository.findById(id).orElseThrow(() -> new RuntimeException("Quiz not found"));
         return new QuizResponseDTO(quiz.getQuizId(), quiz.getLesson().getLessonId());
     }

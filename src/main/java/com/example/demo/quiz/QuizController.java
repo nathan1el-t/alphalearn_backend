@@ -28,7 +28,7 @@ public class QuizController {
 
     @GetMapping("/{id}")
     public QuizResponseDTO getQuizById(@PathVariable Integer id){
-        return quizService.getQuizById(id);
+        return quizService.getQuizByIdDTO(id);
     }
 
     @PostMapping

@@ -4,8 +4,13 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.quizquestion.dto.QuizQuestionCreateDTO;
+import com.example.demo.quizquestion.dto.QuizQuestionResponseDTO;
 
 @RestController
 @RequestMapping("/api/quizquestions")
@@ -24,5 +29,10 @@ public class QuizQuestionController {
     @GetMapping("/{id}")
     public QuizQuestionResponseDTO getQuizQuestionById(@PathVariable Integer id){
         return quizQuestionService.getQuestionById(id);
+    }
+
+    @PostMapping
+    public QuizQuestion createQuizQuestion(@RequestBody QuizQuestionCreateDTO request){
+        return quizQuestionService.createQuizQuestion(request);
     }
 }
