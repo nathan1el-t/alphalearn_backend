@@ -43,24 +43,27 @@ public class ConceptService {
     }
 
     // Create new concept
-    public ConceptDTO createConcept(Concept concept) {
+    public ConceptDTO createConcept(ConceptCreateDTO request) {
 
-        // Force backend-controlled fields
-        concept.setModerationStatus(ModerationStatus.PENDING);
-        concept.setCreatedAt(OffsetDateTime.now());
+    Concept concept = new Concept();
 
-        System.out.println(concept.getModerationStatus().getClass());
+    concept.setTitle(request.title());
+    concept.setDescription(request.description());
 
-        Concept savedConcept = conceptRepository.save(concept);
+    // Backend controlled fields
+    concept.setModerationStatus(ModerationStatus.PENDING);
+    concept.setCreatedAt(OffsetDateTime.now());
 
-        return new ConceptDTO(
-                savedConcept.getConceptId(),
-                savedConcept.getTitle(),
-                savedConcept.getDescription(),
-                savedConcept.getModerationStatus().name(),
-                savedConcept.getCreatedAt()
-        );
-    }
+    Concept savedConcept = conceptRepository.save(concept);
+
+    return new ConceptDTO(
+            savedConcept.getConceptId(),
+            savedConcept.getTitle(),
+            savedConcept.getDescription(),
+            savedConcept.getModerationStatus().name(),
+            savedConcept.getCreatedAt()
+    );
+}
 
     // Update existing concept
     public ConceptDTO updateConcept(Integer id, Concept updatedConcept) {

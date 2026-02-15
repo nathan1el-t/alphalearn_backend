@@ -45,7 +45,7 @@ public class ConceptController {
      * The json body should NOT contain fields: moderationStatus, createdAt, and conceptId.
      */
     @PostMapping
-    public ConceptDTO createConcept(@RequestBody Concept concept) {
+    public ConceptDTO createConcept(@RequestBody ConceptCreateDTO concept) {
         return service.createConcept(concept);
     }
     
