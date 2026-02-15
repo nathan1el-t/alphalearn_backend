@@ -26,13 +26,13 @@ public class Quiz {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "lesson_id", nullable = false)
-    private Lesson lessonId;    
+    private Lesson lesson;    
 
     //Should Add createdAt row in database
     // @Column(name = "created_at", nullable = false)
     // private OffsetDateTime createdAt;
 
-    public Quiz(Lesson lessonId){
-        this.lessonId = lessonId;
+    public Quiz(Lesson lesson){
+        this.lesson = lesson;
     }
 }
