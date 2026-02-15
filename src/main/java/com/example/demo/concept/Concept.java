@@ -2,6 +2,9 @@ package com.example.demo.concept;
 
 import java.time.OffsetDateTime;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,10 +36,14 @@ public class Concept {
     @Column(nullable = false, columnDefinition = "text")
     private String description;
 
+    // @Column(name = "moderation_status", nullable = false)
+    // private String moderationStatus;
+    // // mapped as String to avoid enum mismatch
+    // // Enums: PENDING, APPROVED, REJECTED
+
     @Column(name = "moderation_status", nullable = false)
-    private String moderationStatus;
-    // mapped as String to avoid enum mismatch
-    // Enums: PENDING, APPROVED, REJECTED
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    private ModerationStatus moderationStatus;
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
