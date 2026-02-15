@@ -1,6 +1,5 @@
 package com.example.demo.quiz;
 
-public record QuizResponseDTO(
-    Integer quizId,
+public record QuizCreateResponseDTO(
     Integer lessonId
 ) {}

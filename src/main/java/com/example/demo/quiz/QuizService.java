@@ -4,13 +4,17 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.demo.lesson.LessonService;
+
 @Service
 public class QuizService {
 
+    private final LessonService lessonService;
     private final QuizRepository quizRepository;
 
-    public QuizService(QuizRepository quizRepository) {
+    public QuizService(QuizRepository quizRepository, LessonService lessonService) {
         this.quizRepository = quizRepository;
+        this.lessonService = lessonService;
     }
 
     public List<QuizResponseDTO> getAllQuizzes() {
