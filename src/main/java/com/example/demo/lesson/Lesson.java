@@ -43,6 +43,10 @@ public class Lesson {
     @Column(nullable = false)
     private String title;
 
+    // to be removed
+    @Column(name = "learning_objectives")
+    private String learningObjectives;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "content", columnDefinition = "jsonb", nullable = false)
     private JsonNode content;

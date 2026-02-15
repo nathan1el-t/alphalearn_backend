@@ -2,11 +2,10 @@ package com.example.demo.lesson.dto;
 
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 public record CreateLessonRequest(
         String title,
-        JsonNode content,
+        String learningObjectives,
+        Object content,
         Integer conceptId,
         UUID contributorId,
         Boolean submit
