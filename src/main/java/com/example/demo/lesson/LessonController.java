@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.lesson.dto.CreateLessonRequest;
+import com.example.demo.lesson.dto.LessonDTO;
 
 @RestController
 @RequestMapping("/api/lessons")
@@ -24,18 +25,18 @@ public class LessonController {
     }
 
     @GetMapping
-    public List<Lesson> getLessons() {
+    public List<LessonDTO> getLessons() {
         return lessonService.getAllLessons();
     }
 
     @GetMapping("/{lessonId}")
-    public Lesson getLesson(@PathVariable Integer lessonId) {
+    public LessonDTO getLesson(@PathVariable Integer lessonId) {
         return lessonService.getLessonById(lessonId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Lesson createLesson(@RequestBody CreateLessonRequest request) {
+    public LessonDTO createLesson(@RequestBody CreateLessonRequest request) {
         return lessonService.createLesson(request);
     }
 }

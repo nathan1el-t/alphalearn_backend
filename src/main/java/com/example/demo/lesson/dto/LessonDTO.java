@@ -1,13 +1,15 @@
 package com.example.demo.lesson.dto;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public record CreateLessonRequest(
+public record LessonDTO(
+        Integer lessonId,
         String title,
         JsonNode content,
-        Integer conceptId,
+        String moderationStatus,
         UUID contributorId,
-        Boolean submit
+        OffsetDateTime createdAt
 ) {}
