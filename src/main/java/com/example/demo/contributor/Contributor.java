@@ -3,7 +3,7 @@ package com.example.demo.contributor;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-import com.example.demo.profile.Profile;
+import com.example.demo.learner.Learner;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -17,7 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@JsonIgnoreProperties("profile") //temporary fix to prevent loop, to review in the future
+@JsonIgnoreProperties("learner") //temporary fix to prevent loop, to review in the future
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,7 +32,7 @@ public class Contributor {
     @OneToOne
     @MapsId
     @JoinColumn(name = "contributor_id")
-    private Profile profile;
+    private Learner learner;
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
