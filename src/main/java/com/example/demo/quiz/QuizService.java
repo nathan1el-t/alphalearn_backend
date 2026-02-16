@@ -33,7 +33,22 @@ public class QuizService {
     }
 
     public Quiz createQuiz(QuizCreateDTO request){
-        Quiz quiz = new Quiz(lessonService.getLessonById(request.lessonId()));
+        Quiz quiz = new Quiz(lessonService.getLessonEntityById(request.lessonId()));
         return quizRepository.saveAndFlush(quiz);
+    }
+
+    public QuizResponseDTO updateQuiz(Integer id, QuizCreateDTO request){
+        Quiz existingQuiz = quizRepository.findById(id).orElseThrow(() -> new RuntimeException("Quiz not found"));
+        existingQuiz.setLesson(lessonService.getLessonEntityById(request.lessonId()));
+        Quiz updatedQuiz = quizRepository.save(existingQuiz); //save does both create and update, if the entity's id does not exist then it creates, if it does then it updates
+        return new QuizResponseDTO(
+            updatedQuiz.getQuizId(),
+            updatedQuiz.getLesson().getLessonId()
+        );
+    }
+
+    public void deleteQuiz(Integer id){
+        Quiz existingQuiz = quizRepository.findById(id).orElseThrow(() -> new RuntimeException("Quiz not found"));
+        quizRepository.delete(existingQuiz);
     }
 }

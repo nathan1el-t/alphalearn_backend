@@ -2,9 +2,11 @@ package com.example.demo.quiz;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,5 +36,15 @@ public class QuizController {
     @PostMapping
     public Quiz createQuiz(@RequestBody QuizCreateDTO request){
         return quizService.createQuiz(request); //find a way to clean up json that is returned after post
+    }
+
+    @PutMapping("/{id}")
+    public QuizResponseDTO updateQuiz(@PathVariable Integer id, @RequestBody QuizCreateDTO request){
+        return quizService.updateQuiz(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteQuiz(@PathVariable Integer id){
+        quizService.deleteQuiz(id);
     }
 }

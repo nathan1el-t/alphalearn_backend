@@ -68,6 +68,13 @@ public class LessonService {
         return toDTO(lesson);
     }
 
+    //need a method that returns a lesson for quizzes
+    public Lesson getLessonEntityById(Integer lessonId) {
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
+        return lesson;
+    }
+
     @Transactional
     public LessonDTO createLesson(CreateLessonRequest request) {
         if (request == null) {

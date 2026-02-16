@@ -41,8 +41,34 @@ public class QuizQuestionService {
         );
     }
 
+    public QuizQuestion getQuestionEntityById(Integer id){
+        QuizQuestion quizQuestion = quizQuestionRepository.findById(id).orElseThrow(() -> new RuntimeException("Quiz Question not found"));
+        return quizQuestion;
+    }
+
     public QuizQuestion createQuizQuestion(QuizQuestionCreateDTO request){
         QuizQuestion quizQuestion = new QuizQuestion(request.questionText(), request.quizQuestionType(), request.correctAnswer(), quizService.getQuizById(request.quizId()));
         return quizQuestionRepository.save(quizQuestion);
+    }
+
+    public QuizQuestionResponseDTO updateQuizQuestion(Integer id, QuizQuestionCreateDTO request){
+        QuizQuestion existingQuizQuestion = quizQuestionRepository.findById(id).orElseThrow(() -> new RuntimeException("Quiz Question not found"));
+        existingQuizQuestion.setQuestionText(request.questionText());
+        existingQuizQuestion.setQuizQuestionType(request.quizQuestionType());
+        existingQuizQuestion.setCorrectAnswer(request.correctAnswer());
+        existingQuizQuestion.setQuiz(quizService.getQuizById(request.quizId()));
+        QuizQuestion savedQuizQuestion = quizQuestionRepository.save(existingQuizQuestion);
+        return new QuizQuestionResponseDTO(
+            savedQuizQuestion.getQuestionId(),
+            savedQuizQuestion.getQuiz().getQuizId(),
+            savedQuizQuestion.getQuestionText(),
+            savedQuizQuestion.getQuizQuestionType(),
+            savedQuizQuestion.getCorrectAnswer()
+        );
+    }
+
+    public void deleteQuizQuestion(Integer id){
+        QuizQuestion existingQuizQuestion = quizQuestionRepository.findById(id).orElseThrow(() -> new RuntimeException("Quiz Question not found"));
+        quizQuestionRepository.delete(existingQuizQuestion);
     }
 }
