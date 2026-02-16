@@ -2,6 +2,8 @@ package com.example.demo.quizattempt;
 
 import java.time.OffsetDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.example.demo.learner.Learner;
 import com.example.demo.quiz.Quiz;
 
@@ -24,8 +26,8 @@ import lombok.Setter;
 @Table(name = "quiz_attempts")
 public class QuizAttempt {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "attempt_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer attemptId;
 
     @ManyToOne
@@ -33,11 +35,12 @@ public class QuizAttempt {
     private Quiz quiz;
 
     @Column(name = "score")
-    private Integer score;
+    private Short score;
 
     @Column(name = "is_first_attempt")
-    private boolean isFirstAttempt;
+    private Boolean isFirstAttempt;
 
+    @CreationTimestamp
     @Column(name = "attempted_at")
     private OffsetDateTime attemptedAt;
 
@@ -45,4 +48,10 @@ public class QuizAttempt {
     @JoinColumn(name = "learner_id", nullable = false)
     private Learner learner; 
 
+    public QuizAttempt(Quiz quiz, short score, Boolean isFirstAttempt, Learner learner){
+        this.quiz = quiz;
+        this.score = score;
+        this.isFirstAttempt = isFirstAttempt;
+        this.learner = learner;
+    }
 }
