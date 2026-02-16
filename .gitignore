@@ -35,3 +35,4 @@ build/
 ### Local secrets ###
 application-local.properties
 .env
+MOCKDATA.md
