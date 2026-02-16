@@ -1,13 +1,12 @@
-package com.example.demo.lesson.dto;
+package com.example.demo.lesson.dto.response;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public record LessonDTO(
+public record LessonContributorSummaryDto(
         Integer lessonId,
         String title,
         String learningObjectives,
-        Object content,
         String moderationStatus,
         UUID contributorId,
         OffsetDateTime createdAt

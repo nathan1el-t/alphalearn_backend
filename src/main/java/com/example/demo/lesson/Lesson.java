@@ -26,7 +26,6 @@ import jakarta.persistence.Table;
 @Getter
 @Setter
 @NoArgsConstructor
-@RequiredArgsConstructor
 @Entity
 @Table(name = "lessons")
 public class Lesson {
