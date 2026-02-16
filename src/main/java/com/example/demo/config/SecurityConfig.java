@@ -28,6 +28,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/lessons/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/lessons/**").hasRole("CONTRIBUTOR")
                         .requestMatchers(HttpMethod.PUT, "/api/lessons/**").hasRole("CONTRIBUTOR")
+                        .requestMatchers(HttpMethod.POST, "/api/contributors/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/contributors/**").authenticated()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
