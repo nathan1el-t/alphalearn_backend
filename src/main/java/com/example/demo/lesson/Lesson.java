@@ -8,6 +8,7 @@ import org.hibernate.type.SqlTypes;
 import com.example.demo.contributor.Contributor;
 import com.example.demo.lesson.enums.LessonModerationStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,8 +43,13 @@ public class Lesson {
     @Column(nullable = false)
     private String title;
 
-    @Column(name = "learning_objectives", nullable = false)
+    // to be removed
+    @Column(name = "learning_objectives")
     private String learningObjectives;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "content", columnDefinition = "jsonb", nullable = false)
+    private JsonNode content;
 
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)

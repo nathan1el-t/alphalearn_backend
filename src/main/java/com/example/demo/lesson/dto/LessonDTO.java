@@ -1,12 +1,14 @@
 package com.example.demo.lesson.dto;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public record CreateLessonRequest(
+public record LessonDTO(
+        Integer lessonId,
         String title,
         String learningObjectives,
         Object content,
-        Integer conceptId,
+        String moderationStatus,
         UUID contributorId,
-        Boolean submit
+        OffsetDateTime createdAt
 ) {}

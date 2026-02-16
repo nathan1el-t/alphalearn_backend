@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.concept.Concept;
@@ -13,10 +14,11 @@ import com.example.demo.concept.ConceptRepository;
 import com.example.demo.contributor.Contributor;
 import com.example.demo.contributor.ContributorRepository;
 import com.example.demo.lesson.dto.CreateLessonRequest;
+import com.example.demo.lesson.dto.LessonDTO;
+import com.example.demo.lesson.dto.UpdateLessonRequest;
 import com.example.demo.lesson.enums.LessonModerationStatus;
-import com.example.demo.lessonconcept.LessonConcept;
-import com.example.demo.lessonconcept.LessonConceptId;
-import com.example.demo.lessonconcept.LessonConceptRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class LessonService {
@@ -24,43 +26,64 @@ public class LessonService {
     private final LessonRepository lessonRepository;
     private final ContributorRepository contributorRepository;
     private final ConceptRepository conceptRepository;
-    private final LessonConceptRepository lessonConceptRepository;
-
+    private final ObjectMapper objectMapper;
     public LessonService(
             LessonRepository lessonRepository,
             ContributorRepository contributorRepository,
             ConceptRepository conceptRepository,
-            LessonConceptRepository lessonConceptRepository
+            ObjectMapper objectMapper
     ) {
         this.lessonRepository = lessonRepository;
         this.contributorRepository = contributorRepository;
         this.conceptRepository = conceptRepository;
-        this.lessonConceptRepository = lessonConceptRepository;
+        this.objectMapper = objectMapper;
     }
 
-    public List<Lesson> getAllLessons() {
-        return lessonRepository.findAll();
+    public List<LessonDTO> getLessons(Integer conceptId, UUID contributorId) {
+        List<Lesson> lessons;
+
+        if (conceptId != null && contributorId != null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Provide either conceptId or contributorId, not both"
+            );
+        }
+
+        if (conceptId == null && contributorId == null) {
+            lessons = lessonRepository.findAll();
+        } else if (conceptId != null) {
+            lessons = lessonRepository.findByConceptId(conceptId);
+        } else {
+            lessons = lessonRepository.findByContributor_ContributorId(contributorId);
+        }
+
+        return lessons.stream()
+                .map(this::toDTO)
+                .toList();
     }
 
-    public Lesson getLessonById(Integer lessonId) {
-        return lessonRepository.findById(lessonId)
+    public LessonDTO getLessonById(Integer lessonId) {
+        Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
+        return toDTO(lesson);
     }
 
-    public Lesson createLesson(CreateLessonRequest request) {
+    @Transactional
+    public LessonDTO createLesson(CreateLessonRequest request) {
         if (request == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is required");
         }
 
         String title = trimToNull(request.title());
         String learningObjectives = trimToNull(request.learningObjectives());
+        Object content = request.content();
         Integer conceptId = request.conceptId();
         UUID contributorId = request.contributorId();
 
-        if (title == null || learningObjectives == null || conceptId == null || contributorId == null) {
+        if (title == null || learningObjectives == null || content == null || conceptId == null || contributorId == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "title, learningObjectives, conceptId, and contributorId are required"
+                    "title, learningObjectives, content, conceptId, and contributorId are required"
             );
         }
 
@@ -74,6 +97,7 @@ public class LessonService {
                 null,
                 title,
                 learningObjectives,
+                objectMapper.valueToTree(content),
                 submit ? LessonModerationStatus.PENDING : LessonModerationStatus.UNPUBLISHED,
                 contributor,
                 OffsetDateTime.now()
@@ -81,15 +105,54 @@ public class LessonService {
 
         Lesson saved = lessonRepository.save(lesson);
 
-        LessonConcept lessonConcept = new LessonConcept(
-                new LessonConceptId(saved.getLessonId(), concept.getConceptId()),
-                saved,
-                concept,
-                (short) 1
-        );
-        lessonConceptRepository.save(lessonConcept);
+        lessonRepository.insertLessonConcept(saved.getLessonId(), concept.getConceptId(), (short) 1);
 
-        return saved;
+        return toDTO(saved);
+    }
+
+    public LessonDTO updateLesson(Integer lessonId, UpdateLessonRequest request) {
+        if (request == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is required");
+        }
+
+        String title = trimToNull(request.title());
+        String learningObjectives = trimToNull(request.learningObjectives());
+        Object content = request.content();
+
+        if (title == null || learningObjectives == null || content == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "title, learningObjectives, and content are required"
+            );
+        }
+
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
+
+        lesson.setTitle(title);
+        lesson.setLearningObjectives(learningObjectives);
+        lesson.setContent(objectMapper.valueToTree(content));
+
+        Lesson saved = lessonRepository.save(lesson);
+        return toDTO(saved);
+    }
+
+    public LessonDTO submitLesson(Integer lessonId) {
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
+
+        lesson.setModerationStatus(LessonModerationStatus.PENDING);
+        Lesson saved = lessonRepository.save(lesson);
+        return toDTO(saved);
+    }
+
+    public LessonDTO unpublishLesson(Integer lessonId) {
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
+
+        lesson.setModerationStatus(LessonModerationStatus.UNPUBLISHED);
+        Lesson saved = lessonRepository.save(lesson);
+        return toDTO(saved);
     }
 
     private String trimToNull(String value) {
@@ -98,6 +161,18 @@ public class LessonService {
         }
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private LessonDTO toDTO(Lesson lesson) {
+        return new LessonDTO(
+                lesson.getLessonId(),
+                lesson.getTitle(),
+                lesson.getLearningObjectives(),
+                objectMapper.convertValue(lesson.getContent(), Object.class),
+                lesson.getModerationStatus().name(),
+                lesson.getContributor().getContributorId(),
+                lesson.getCreatedAt()
+        );
     }
 
 }
