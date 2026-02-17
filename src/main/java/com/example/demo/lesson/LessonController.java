@@ -1,6 +1,7 @@
 package com.example.demo.lesson;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,11 +14,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.lesson.dto.CreateLessonRequest;
-import com.example.demo.lesson.dto.LessonDTO;
-import com.example.demo.lesson.dto.UpdateLessonRequest;
+import com.example.demo.lesson.dto.request.CreateLessonRequest;
+import com.example.demo.lesson.dto.request.UpdateLessonRequest;
+import com.example.demo.lesson.dto.response.LessonContributorSummaryDto;
+import com.example.demo.lesson.dto.response.LessonDetailDto;
+import com.example.demo.lesson.dto.response.LessonDetailView;
+import com.example.demo.lesson.dto.response.LessonPublicSummaryDto;
+import com.example.demo.config.SupabaseAuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/lessons")
@@ -31,45 +38,81 @@ public class LessonController {
     }
 
     @GetMapping
-    @Operation(summary = "List lessons", description = "Optionally filter by conceptId or contributorId")
-    public List<LessonDTO> getLessons(
-            @RequestParam(required = false) Integer conceptId,
-            @RequestParam(required = false) java.util.UUID contributorId
+    @Operation(summary = "List lessons", description = "Optionally filter by conceptId")
+    public List<LessonPublicSummaryDto> getAllLessons(
+            @RequestParam(required = false) List<Integer> conceptIds,
+            @RequestParam(defaultValue = "any") String conceptsMatch
     ) {
-        return lessonService.getLessons(conceptId, contributorId);
+        if (conceptIds == null || conceptIds.isEmpty()) {
+            return lessonService.findAllLessons();
+        }
+
+        if (conceptsMatch.equals("any")) {
+            return lessonService.getLessonsByConcepts(conceptIds);
+        }
+
+        return lessonService.getLessonsByAllConcepts(conceptIds);
+    }
+
+    @GetMapping("/mine")
+    @Operation(summary = "List my lessons", description = "Contributor-only; optional concept filter")
+    public List<LessonContributorSummaryDto> getMyLessons(
+            @AuthenticationPrincipal SupabaseAuthUser user,
+            @RequestParam(required = false) List<Integer> conceptIds,
+            @RequestParam(defaultValue = "any") String conceptsMatch
+    ) {
+        if (user == null || !user.isContributor()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Contributor access required");
+        }
+        UUID contributorId = user.userId();
+        return lessonService.getLessonsByContributor(contributorId, conceptIds, conceptsMatch);
     }
 
     @GetMapping("/{lessonId}")
     @Operation(summary = "Get lesson by ID")
-    public LessonDTO getLesson(@PathVariable Integer lessonId) {
-        return lessonService.getLessonById(lessonId);
+    public LessonDetailView getLesson(
+            @PathVariable Integer lessonId,
+            @AuthenticationPrincipal SupabaseAuthUser user
+    ) {
+        return lessonService.getLessonDetailForUser(lessonId, user);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create lesson")
-    public LessonDTO createLesson(@RequestBody CreateLessonRequest request) {
-        return lessonService.createLesson(request);
+    public LessonDetailDto createLesson(
+            @RequestBody CreateLessonRequest request,
+            @AuthenticationPrincipal SupabaseAuthUser user
+    ) {
+        return lessonService.createLesson(request, user);
     }
 
     @PutMapping("/{lessonId}")
     @Operation(summary = "Update lesson content")
-    public LessonDTO updateLesson(
+    public LessonDetailDto updateLesson(
             @PathVariable Integer lessonId,
-            @RequestBody UpdateLessonRequest request
+            @RequestBody UpdateLessonRequest request,
+            @AuthenticationPrincipal SupabaseAuthUser user
     ) {
-        return lessonService.updateLesson(lessonId, request);
+        return lessonService.updateLesson(lessonId, request, user);
     }
 
     @PostMapping("/{lessonId}/submit")
     @Operation(summary = "Submit lesson for review")
-    public LessonDTO submitLesson(@PathVariable Integer lessonId) {
-        return lessonService.submitLesson(lessonId);
+    public LessonDetailDto submitLesson(
+            @PathVariable Integer lessonId,
+            @AuthenticationPrincipal SupabaseAuthUser user
+    ) {
+        return lessonService.submitLesson(lessonId, user);
     }
 
     @PostMapping("/{lessonId}/unpublish")
     @Operation(summary = "Unpublish lesson")
-    public LessonDTO unpublishLesson(@PathVariable Integer lessonId) {
-        return lessonService.unpublishLesson(lessonId);
+    public LessonDetailDto unpublishLesson(
+            @PathVariable Integer lessonId,
+            @AuthenticationPrincipal SupabaseAuthUser user
+    ) {
+        return lessonService.unpublishLesson(lessonId, user);
     }
+
 }
