@@ -34,7 +34,7 @@ public class QuizQuestionController {
     }
 
     @PostMapping
-    public QuizQuestion createQuizQuestion(@RequestBody QuizQuestionCreateDTO request){
+    public QuizQuestionResponseDTO createQuizQuestion(@RequestBody QuizQuestionCreateDTO request){
         return quizQuestionService.createQuizQuestion(request);
     }
 

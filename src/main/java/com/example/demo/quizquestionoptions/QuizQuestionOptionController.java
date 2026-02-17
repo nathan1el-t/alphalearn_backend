@@ -39,7 +39,7 @@ public class QuizQuestionOptionController {
     }
 
     @PutMapping("/{id}")
-    public QuizQuestionOption updateQuestionOption(@PathVariable Integer id, @RequestBody QuizQuestionOptionCreateDTO request){
+    public QuizQuestionOptionResponseDTO updateQuestionOption(@PathVariable Integer id, @RequestBody QuizQuestionOptionCreateDTO request){
         return quizQuestionOptionService.updateQuestionOption(id, request);
     }
 

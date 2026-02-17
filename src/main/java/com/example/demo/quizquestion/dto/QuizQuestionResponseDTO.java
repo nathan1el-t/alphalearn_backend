@@ -6,6 +6,6 @@ public record QuizQuestionResponseDTO(
     Integer questionId,
     Integer quizId,
     String questionText,
-    QuizQuestionType quiz_question_type,
-    String correct_answer
+    QuizQuestionType quizQuestionType,
+    String correctAnswer
 ) {}

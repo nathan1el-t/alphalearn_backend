@@ -34,7 +34,7 @@ public class QuizController {
     }
 
     @PostMapping
-    public Quiz createQuiz(@RequestBody QuizCreateDTO request){
+    public QuizResponseDTO createQuiz(@RequestBody QuizCreateDTO request){
         return quizService.createQuiz(request); //find a way to clean up json that is returned after post
     }
 

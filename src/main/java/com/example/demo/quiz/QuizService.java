@@ -2,7 +2,9 @@ package com.example.demo.quiz;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.lesson.LessonService;
 import com.example.demo.quiz.dto.QuizCreateDTO;
@@ -24,21 +26,29 @@ public class QuizService {
     }
 
     public Quiz getQuizById(Integer id){
-        return quizRepository.findById(id).orElseThrow(() -> new RuntimeException("Quiz not found"));
+        if(id == null){throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quiz id cannot be null");}
+        return quizRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found"));
     }
-
+    
     public QuizResponseDTO getQuizByIdDTO(Integer id) {
-        Quiz quiz = quizRepository.findById(id).orElseThrow(() -> new RuntimeException("Quiz not found"));
+        if(id == null){throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quiz id cannot be null");}
+        Quiz quiz = quizRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found"));
         return new QuizResponseDTO(quiz.getQuizId(), quiz.getLesson().getLessonId());
     }
-
-    public Quiz createQuiz(QuizCreateDTO request){
+    
+    public QuizResponseDTO createQuiz(QuizCreateDTO request){
+        if(request == null || request.lessonId() == null){throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request cannot be null");}
         Quiz quiz = new Quiz(lessonService.getLessonEntityById(request.lessonId()));
-        return quizRepository.saveAndFlush(quiz);
+        Quiz createdQuiz = quizRepository.saveAndFlush(quiz);
+        return new QuizResponseDTO(
+            createdQuiz.getQuizId(),
+            createdQuiz.getLesson().getLessonId()
+        );
     }
-
+    
     public QuizResponseDTO updateQuiz(Integer id, QuizCreateDTO request){
-        Quiz existingQuiz = quizRepository.findById(id).orElseThrow(() -> new RuntimeException("Quiz not found"));
+        if(id == null || request == null || request.lessonId() == null){throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quiz id or request cannot be null");}
+        Quiz existingQuiz = quizRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found"));
         existingQuiz.setLesson(lessonService.getLessonEntityById(request.lessonId()));
         Quiz updatedQuiz = quizRepository.save(existingQuiz); //save does both create and update, if the entity's id does not exist then it creates, if it does then it updates
         return new QuizResponseDTO(
@@ -46,9 +56,10 @@ public class QuizService {
             updatedQuiz.getLesson().getLessonId()
         );
     }
-
+    
     public void deleteQuiz(Integer id){
-        Quiz existingQuiz = quizRepository.findById(id).orElseThrow(() -> new RuntimeException("Quiz not found"));
+        if(id == null){throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quiz id or request cannot be null");}
+        Quiz existingQuiz = quizRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found"));
         quizRepository.delete(existingQuiz);
     }
 }

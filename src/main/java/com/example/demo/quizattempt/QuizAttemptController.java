@@ -35,7 +35,7 @@ public class QuizAttemptController {
     }
 
     @PostMapping()
-    public QuizAttempt createQuizAttempt(@RequestBody QuizAttemptCreateDTO request){
+    public QuizAttemptResponseDTO createQuizAttempt(@RequestBody QuizAttemptCreateDTO request){
         return quizAttemptService.createQuizAttempt(request);
     }
 
