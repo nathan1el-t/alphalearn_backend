@@ -1,4 +1,4 @@
-package com.example.demo.lesson.dto;
+package com.example.demo.lesson.dto.request;
 
 public record UpdateLessonRequest(
         String title,
