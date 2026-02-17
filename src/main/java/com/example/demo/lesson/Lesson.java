@@ -2,6 +2,7 @@ package com.example.demo.lesson;
 
 import java.time.OffsetDateTime;
 
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -20,16 +21,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @JsonIgnoreProperties({"profile"}) //temporary fix to prevent loop, to review in the future
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "lessons")
 public class Lesson {
@@ -54,7 +50,7 @@ public class Lesson {
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "moderation_status", nullable = false, columnDefinition = "lessons_moderation_status")
-    private LessonModerationStatus moderationStatus;
+    private LessonModerationStatus lessonModerationStatus;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "contributor_id", nullable = false)
@@ -62,4 +58,23 @@ public class Lesson {
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
+
+    @Column(name = "deleted_at")
+    private OffsetDateTime deletedAt;
+
+    public Lesson(
+            String title,
+            String learningObjectives,
+            JsonNode content,
+            LessonModerationStatus lessonModerationStatus,
+            Contributor contributor,
+            OffsetDateTime createdAt
+    ) {
+        this.title = title;
+        this.learningObjectives = learningObjectives;
+        this.content = content;
+        this.lessonModerationStatus = lessonModerationStatus;
+        this.contributor = contributor;
+        this.createdAt = createdAt;
+    }
 }
