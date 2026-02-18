@@ -68,6 +68,14 @@ public class LessonController {
         return lessonService.getLessonsByContributor(contributorId, conceptIds, conceptsMatch);
     }
 
+    @GetMapping("/contributor/{contributorId}")
+    @Operation(summary = "List public lessons by contributor", description = "Returns APPROVED lessons only")
+    public List<LessonPublicSummaryDto> getPublicLessonsByContributor(
+            @PathVariable UUID contributorId
+    ) {
+        return lessonService.getPublicLessonsByContributor(contributorId);
+    }
+
     @GetMapping("/{lessonId}")
     @Operation(summary = "Get lesson by ID")
     public LessonDetailView getLesson(

@@ -46,8 +46,20 @@ public class LessonService {
     }
 
     public List<LessonPublicSummaryDto>  findAllLessons() {
-        List<Lesson> lessons = lessonRepository.findAll();
+        List<Lesson> lessons = lessonRepository.findByLessonModerationStatus(LessonModerationStatus.APPROVED);
         return lessons.stream()
+                .filter(this::isApproved)
+                .map(this::toPublicSummaryDto)
+                .toList();
+    }
+
+    public List<LessonPublicSummaryDto> getPublicLessonsByContributor(UUID contributorId) {
+        List<Lesson> lessons = lessonRepository.findByContributor_ContributorIdAndLessonModerationStatus(
+                contributorId,
+                LessonModerationStatus.APPROVED
+        );
+        return lessons.stream()
+                .filter(this::isApproved)
                 .map(this::toPublicSummaryDto)
                 .toList();
     }
@@ -79,6 +91,7 @@ public class LessonService {
 
         List<Lesson> lessons = lessonRepository.findByConceptIds(conceptIds);
         return lessons.stream()
+                .filter(this::isApproved)
                 .map(this::toPublicSummaryDto)
                 .toList();
     }
@@ -95,6 +108,7 @@ public class LessonService {
         );
 
         return lessons.stream()
+                .filter(this::isApproved)
                 .map(this::toPublicSummaryDto)
                 .toList();
     }
@@ -106,6 +120,9 @@ public class LessonService {
                 && lesson.getContributor() != null
                 && lesson.getContributor().getContributorId().equals(user.userId())) {
             return toDetailDto(lesson);
+        }
+        if (lesson.getLessonModerationStatus() != LessonModerationStatus.APPROVED) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found");
         }
         return toPublicDetailDto(lesson);
     }
@@ -277,6 +294,10 @@ public class LessonService {
             UUID contributorId,
             OffsetDateTime createdAt
     ) {}
+
+    private boolean isApproved(Lesson lesson) {
+        return lesson.getLessonModerationStatus() == LessonModerationStatus.APPROVED;
+    }
 
     private void requireContributorUser(SupabaseAuthUser user) {
         if (user == null || !user.isContributor()) {

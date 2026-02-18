@@ -8,8 +8,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.example.demo.lesson.enums.LessonModerationStatus;
+
 public interface LessonRepository extends JpaRepository<Lesson, Integer> {
     List<Lesson> findByContributor_ContributorId(UUID contributorId);
+    List<Lesson> findByContributor_ContributorIdAndLessonModerationStatus(UUID contributorId, LessonModerationStatus status);
+    List<Lesson> findByLessonModerationStatus(LessonModerationStatus status);
     boolean existsByContributor_ContributorId(UUID contributorId);
 
     @Query(
@@ -18,6 +22,7 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
                 from lessons l
                 join lesson_concepts lc on lc.lesson_id = l.lesson_id
                 where lc.concept_id in (:conceptIds)
+                  and l.moderation_status = 'APPROVED'
             """,
             nativeQuery = true
     )
@@ -29,6 +34,7 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
                 from lessons l 
                 join lesson_concepts lc on lc.lesson_id = l.lesson_id
                 where lc.concept_id in (:conceptIds)
+                  and l.moderation_status = 'APPROVED'
                 group by l.lesson_id
                 having count(distinct lc.concept_id) = :conceptCount
             """,
