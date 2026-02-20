@@ -3,15 +3,23 @@ package com.example.demo.concept;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import com.example.demo.lessonconcept.LessonConceptRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ConceptService {
 
     private final ConceptRepository conceptRepository;
+    private final LessonConceptRepository lessonConceptRepository;
 
-    public ConceptService(ConceptRepository conceptRepository) {
+    public ConceptService(
+            ConceptRepository conceptRepository,
+            LessonConceptRepository lessonConceptRepository
+    ) {
         this.conceptRepository = conceptRepository;
+        this.lessonConceptRepository = lessonConceptRepository;
     }
 
     // Get all cocncepts
@@ -31,7 +39,7 @@ public class ConceptService {
     // Get concept by ID
     public ConceptDTO getConceptById(Integer id) {
         Concept concept = conceptRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Concept not found with id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Concept not found: " + id));
 
         return new ConceptDTO(
                 concept.getConceptId(),
@@ -69,7 +77,7 @@ public class ConceptService {
     public ConceptDTO updateConcept(Integer id, Concept updatedConcept) {
 
         Concept existing = conceptRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Concept not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Concept not found: " + id));
 
         // Update allowed fields only
         existing.setTitle(updatedConcept.getTitle());
@@ -91,7 +99,16 @@ public class ConceptService {
     public void deleteConcept(Integer id) {
 
         Concept concept = conceptRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Concept not found with id: " + id));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Concept not found: " + id));
+
+        long linkedLessons = lessonConceptRepository.countByIdConceptId(id);
+        if (linkedLessons > 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Cannot delete concept " + id + " because it is used by " + linkedLessons
+                            + " lesson(s). Remove the concept from those lessons first."
+            );
+        }
 
         conceptRepository.delete(concept);
     }
