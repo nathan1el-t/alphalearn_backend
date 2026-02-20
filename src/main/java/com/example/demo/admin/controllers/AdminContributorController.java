@@ -1,4 +1,4 @@
-package com.example.demo.admin;
+package com.example.demo.admin.controllers;
 
 import java.util.List;
 
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/admin/contributors")
-public class AdminController {
+public class AdminContributorController {
 
     private final ContributorService contributorService;
 
-    public AdminController(ContributorService contributorService) {
+    public AdminContributorController(ContributorService contributorService) {
         this.contributorService = contributorService;
     }
 
