@@ -1,9 +1,7 @@
-package com.example.demo.admin.controllers;
+package com.example.demo.concept;
 
-import com.example.demo.concept.Concept;
-import com.example.demo.concept.ConceptCreateDTO;
-import com.example.demo.concept.ConceptDTO;
-import com.example.demo.concept.ConceptService;
+import com.example.demo.concept.dto.ConceptCreateDTO;
+import com.example.demo.concept.dto.ConceptDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,18 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/admin/concepts")
-public class AdminConceptController {
+public class ConceptAdminController {
 
-    private final ConceptService conceptService;
+    private final ConceptAdminService conceptAdminService;
 
-    public AdminConceptController(ConceptService conceptService) {
-        this.conceptService = conceptService;
+    public ConceptAdminController(ConceptAdminService conceptAdminService) {
+        this.conceptAdminService = conceptAdminService;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ConceptDTO createConcept(@RequestBody ConceptCreateDTO concept) {
-        return conceptService.createConcept(concept);
+        return conceptAdminService.createConcept(concept);
     }
 
     @PutMapping("/{id}")
@@ -35,12 +33,12 @@ public class AdminConceptController {
             @PathVariable Integer id,
             @RequestBody Concept updatedConcept
     ) {
-        return conceptService.updateConcept(id, updatedConcept);
+        return conceptAdminService.updateConcept(id, updatedConcept);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteConcept(@PathVariable Integer id) {
-        conceptService.deleteConcept(id);
+        conceptAdminService.deleteConcept(id);
     }
 }

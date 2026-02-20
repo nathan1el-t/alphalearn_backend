@@ -2,6 +2,7 @@ package com.example.demo.concept;
 
 import java.util.List;
 
+import com.example.demo.concept.dto.ConceptDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,4 +1,4 @@
-package com.example.demo.concept;
+package com.example.demo.concept.dto;
 
 public record ConceptCreateDTO(
         String title,
