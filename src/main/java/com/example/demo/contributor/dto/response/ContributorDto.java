@@ -5,5 +5,6 @@ import java.util.UUID;
 
 public record ContributorDto(
         UUID contributorId,
-        OffsetDateTime createdAt
+        OffsetDateTime promotedAt,
+        OffsetDateTime demotedAt
 ) {}

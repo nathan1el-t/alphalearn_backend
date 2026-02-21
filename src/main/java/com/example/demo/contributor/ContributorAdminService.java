@@ -62,7 +62,8 @@ public class ContributorAdminService {
             Contributor contributor = new Contributor(
                     learnerId,
                     null,
-                    OffsetDateTime.now()
+                    OffsetDateTime.now(),
+                    null
             );
             created.add(contributorRepository.save(contributor));
         }
@@ -94,7 +95,9 @@ public class ContributorAdminService {
         }
 
         for (UUID contributorId : request.contributorIds()) {
-            contributorRepository.deleteById(contributorId);
+            // contributorRepository.deleteById(contributorId);
+            Contributor contributor = contributorRepository.findById(contributorId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contributor not found " + contributorId));
+            contributor.setDemotedAt(OffsetDateTime.now());
         }
     }
 }
