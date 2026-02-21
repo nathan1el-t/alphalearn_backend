@@ -63,7 +63,7 @@ class LessonServiceTest {
     @BeforeEach
     void setUp() {
         contributorId = UUID.randomUUID();
-        contributor = new Contributor(contributorId, null, OffsetDateTime.now());
+        contributor = new Contributor(contributorId, null, OffsetDateTime.now(), null);
 
         approvedLesson = createTestLesson(1, "Approved Lesson", LessonModerationStatus.APPROVED);
         pendingLesson = createTestLesson(2, "Pending Lesson", LessonModerationStatus.PENDING);
@@ -327,7 +327,7 @@ class LessonServiceTest {
         void shouldReturnPublicDetailForNonOwner() {
             // Arrange
             UUID otherUserId = UUID.randomUUID();
-            Contributor otherContributor = new Contributor(otherUserId, null, OffsetDateTime.now());
+            Contributor otherContributor = new Contributor(otherUserId, null, OffsetDateTime.now(), null);
             SupabaseAuthUser nonOwner = new SupabaseAuthUser(otherUserId, null, otherContributor);
             when(lessonRepository.findById(1)).thenReturn(Optional.of(approvedLesson));
             when(objectMapper.convertValue(any(), eq(Object.class))).thenReturn("content");
@@ -362,13 +362,16 @@ class LessonServiceTest {
     class CreateLessonTests {
 
         private SupabaseAuthUser contributorUser;
-        private Concept concept;
 
         @BeforeEach
         void setUp() {
             contributorUser = new SupabaseAuthUser(contributorId, null, contributor);
-            concept = mock(Concept.class);
+        }
+
+        private Concept createMockConcept() {
+            Concept concept = mock(Concept.class);
             when(concept.getConceptId()).thenReturn(1);
+            return concept;
         }
 
         @Test
@@ -438,6 +441,7 @@ class LessonServiceTest {
         @DisplayName("should create lesson with UNPUBLISHED status when not submitted")
         void shouldCreateLessonWithUnpublishedStatus() {
             // Arrange
+            Concept concept = createMockConcept();
             CreateLessonRequest request = new CreateLessonRequest(
                     "New Lesson", null, "content", 1, contributorId, false);
             when(contributorRepository.findById(contributorId)).thenReturn(Optional.of(contributor));
@@ -468,7 +472,8 @@ class LessonServiceTest {
         @Test
         @DisplayName("should create lesson with PENDING status when submitted")
         void shouldCreateLessonWithPendingStatusWhenSubmitted() {
-            // Arrange
+            Concept concept = createMockConcept();
+            //Arrange
             CreateLessonRequest request = new CreateLessonRequest(
                     "New Lesson", null, "content", 1, contributorId, true);
             when(contributorRepository.findById(contributorId)).thenReturn(Optional.of(contributor));
@@ -600,7 +605,7 @@ class LessonServiceTest {
         void shouldThrowForbiddenWhenNotOwner() {
             // Arrange
             UUID otherUserId = UUID.randomUUID();
-            Contributor otherContributor = new Contributor(otherUserId, null, OffsetDateTime.now());
+            Contributor otherContributor = new Contributor(otherUserId, null, OffsetDateTime.now(), null);
             SupabaseAuthUser otherUser = new SupabaseAuthUser(otherUserId, null, otherContributor);
             UpdateLessonRequest request = new UpdateLessonRequest("Title", null, "content");
             when(lessonRepository.findById(1)).thenReturn(Optional.of(approvedLesson));
@@ -689,7 +694,7 @@ class LessonServiceTest {
         void shouldThrowForbiddenWhenNotOwner() {
             // Arrange
             UUID otherUserId = UUID.randomUUID();
-            Contributor otherContributor = new Contributor(otherUserId, null, OffsetDateTime.now());
+            Contributor otherContributor = new Contributor(otherUserId, null, OffsetDateTime.now(), null);
             SupabaseAuthUser otherUser = new SupabaseAuthUser(otherUserId, null, otherContributor);
             when(lessonRepository.findById(1)).thenReturn(Optional.of(approvedLesson));
 
