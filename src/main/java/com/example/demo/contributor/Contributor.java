@@ -15,9 +15,11 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @JsonIgnoreProperties("learner") //temporary fix to prevent loop, to review in the future
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -31,8 +33,14 @@ public class Contributor {
     @OneToOne(optional = false)
     @JoinColumn(name = "contributor_id", referencedColumnName = "id", insertable = false, updatable = false)
     private Learner learner;
+    
+    // @Column(name = "total_points")
+    // private Short totalPoints;
 
-    @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt;
+    @Column(name = "promoted_at", nullable = false)
+    private OffsetDateTime promotedAt;
+
+    @Column(name = "demoted_at")
+    private OffsetDateTime demotedAt;
 
 }

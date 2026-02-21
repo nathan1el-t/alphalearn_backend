@@ -23,7 +23,8 @@ public class ContributorService {
     ContributorDto toDto(Contributor contributor) {
         return new ContributorDto(
                 contributor.getContributorId(),
-                contributor.getCreatedAt()
+                contributor.getPromotedAt(),
+                contributor.getDemotedAt()
         );
     }
 }
