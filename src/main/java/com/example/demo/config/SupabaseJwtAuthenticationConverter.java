@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
+import com.example.demo.admin.AdminRepository;
 import com.example.demo.contributor.Contributor;
 import com.example.demo.contributor.ContributorRepository;
 import com.example.demo.learner.Learner;
@@ -21,13 +22,16 @@ public class SupabaseJwtAuthenticationConverter implements Converter<Jwt, Abstra
 
     private final ContributorRepository contributorRepository;
     private final LearnerRepository learnerRepository;
+    private final AdminRepository adminRepository;
 
     public SupabaseJwtAuthenticationConverter(
             ContributorRepository contributorRepository,
-            LearnerRepository learnerRepository
+            LearnerRepository learnerRepository,
+            AdminRepository adminRepository
     ) {
         this.contributorRepository = contributorRepository;
         this.learnerRepository = learnerRepository;
+        this.adminRepository = adminRepository;
     }
 
     @Override
@@ -43,6 +47,9 @@ public class SupabaseJwtAuthenticationConverter implements Converter<Jwt, Abstra
             contributor = contributorRepository.findById(userId).orElse(null);
             if (contributor != null) {
                 authorities.add(new SimpleGrantedAuthority("ROLE_CONTRIBUTOR"));
+            }
+            if (adminRepository.existsById(userId)) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
             }
         }
 
