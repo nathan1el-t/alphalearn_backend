@@ -38,7 +38,4 @@ public class LessonConcept {
     @MapsId("conceptId")
     @JoinColumn(name = "concept_id")
     private Concept concept;
-
-    @Column(name = "display_order", nullable = false)
-    private short displayOrder;
 }

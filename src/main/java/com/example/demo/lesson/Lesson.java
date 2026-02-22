@@ -39,10 +39,6 @@ public class Lesson {
     @Column(nullable = false)
     private String title;
 
-    // to be removed
-    @Column(name = "learning_objectives")
-    private String learningObjectives;
-
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "content", columnDefinition = "jsonb", nullable = false)
     private JsonNode content;
@@ -64,14 +60,12 @@ public class Lesson {
 
     public Lesson(
             String title,
-            String learningObjectives,
             JsonNode content,
             LessonModerationStatus lessonModerationStatus,
             Contributor contributor,
             OffsetDateTime createdAt
     ) {
         this.title = title;
-        this.learningObjectives = learningObjectives;
         this.content = content;
         this.lessonModerationStatus = lessonModerationStatus;
         this.contributor = contributor;
