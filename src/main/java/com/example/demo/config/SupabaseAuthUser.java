@@ -15,6 +15,6 @@ public record SupabaseAuthUser(
     }
 
     public boolean isContributor() {
-        return contributor != null;
+        return contributor != null && contributor.isCurrentContributor();
     }
 }

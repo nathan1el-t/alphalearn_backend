@@ -43,4 +43,7 @@ public class Contributor {
     @Column(name = "demoted_at")
     private OffsetDateTime demotedAt;
 
+    public boolean isCurrentContributor() {
+        return promotedAt != null && (demotedAt == null || promotedAt.isAfter(demotedAt));
+    }
 }
