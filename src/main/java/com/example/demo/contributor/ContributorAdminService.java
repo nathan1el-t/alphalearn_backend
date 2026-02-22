@@ -55,17 +55,25 @@ public class ContributorAdminService {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Learner id is null: " + learnerId);
             }
 
-            if (contributorRepository.existsById(learnerId)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Already a contributor: " + learnerId);
+            Contributor contributor = contributorRepository.findById(learnerId).orElse(null);
+            if (contributor != null) {
+                if (contributor.isCurrentContributor()) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Already a contributor: " + learnerId);
+                }
+
+                contributor.setPromotedAt(OffsetDateTime.now());
+                contributor.setDemotedAt(null);
+                created.add(contributorRepository.save(contributor));
+                continue;
             }
 
-            Contributor contributor = new Contributor(
+            Contributor newContributor = new Contributor(
                     learnerId,
                     null,
                     OffsetDateTime.now(),
                     null
             );
-            created.add(contributorRepository.save(contributor));
+            created.add(contributorRepository.save(newContributor));
         }
 
         return created.stream()
