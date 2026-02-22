@@ -63,7 +63,7 @@ public class LessonService {
 
         List<Lesson> lessons;
         if (conceptIds == null || conceptIds.isEmpty()) {
-            lessons = lessonRepository.findByContributor_ContributorId(contributorId);
+            lessons = lessonRepository.findByContributor_ContributorIdAndDeletedAtIsNull(contributorId);
         } else if ("any".equals(conceptsMatch)) {
             lessons = lessonRepository.findByContributorAndConceptIds(contributorId, conceptIds);
         } else {
@@ -210,6 +210,30 @@ public class LessonService {
         lesson.setLessonModerationStatus(LessonModerationStatus.UNPUBLISHED);
         Lesson saved = lessonRepository.save(lesson);
         return toDetailDto(saved);
+    }
+
+    @Transactional
+    public void softDeleteLesson(Integer lessonId, SupabaseAuthUser user) {
+        if (user == null || user.userId() == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Authenticated user required");
+        }
+
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
+        requireOwner(lesson, user);
+
+        if (lesson.getDeletedAt() != null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found");
+        }
+        if (lesson.getLessonModerationStatus() != LessonModerationStatus.UNPUBLISHED) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Only unpublished lessons can be deleted"
+            );
+        }
+
+        lesson.setDeletedAt(OffsetDateTime.now());
+        lessonRepository.save(lesson);
     }
 
     private String trimToNull(String value) {

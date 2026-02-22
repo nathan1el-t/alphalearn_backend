@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface LessonRepository extends JpaRepository<Lesson, Integer> {
-    List<Lesson> findByContributor_ContributorId(UUID contributorId);
+    List<Lesson> findByContributor_ContributorIdAndDeletedAtIsNull(UUID contributorId);
     boolean existsByContributor_ContributorId(UUID contributorId);
     List<Lesson> findByLessonModerationStatusAndDeletedAtIsNull(com.example.demo.lesson.enums.LessonModerationStatus lessonModerationStatus);
 
@@ -49,6 +49,7 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
                 from lessons l
                 join lesson_concepts lc on lc.lesson_id = l.lesson_id
                 where l.contributor_id = :contributorId
+                  and l.deleted_at is null
                   and lc.concept_id in (:conceptIds)
             """,
             nativeQuery = true
@@ -64,6 +65,7 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
                 from lessons l
                 join lesson_concepts lc on lc.lesson_id = l.lesson_id
                 where l.contributor_id = :contributorId
+                  and l.deleted_at is null
                   and lc.concept_id in (:conceptIds)
                 group by l.lesson_id
                 having count(distinct lc.concept_id) = :conceptCount
