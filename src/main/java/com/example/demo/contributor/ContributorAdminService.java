@@ -86,18 +86,12 @@ public class ContributorAdminService {
             if (!contributorRepository.existsById(contributorId)) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Contributor not found: " + contributorId);
             }
-            if (lessonRepository.existsByContributor_ContributorId(contributorId)) {
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT,
-                        "Contributor has lessons and cannot be demoted: " + contributorId
-                );
-            }
         }
 
         for (UUID contributorId : request.contributorIds()) {
-            // contributorRepository.deleteById(contributorId);
             Contributor contributor = contributorRepository.findById(contributorId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contributor not found " + contributorId));
             contributor.setDemotedAt(OffsetDateTime.now());
+            lessonRepository.unpublishByContributorId(contributorId);
         }
     }
 }

@@ -83,6 +83,18 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
             value = "insert into lesson_concepts (lesson_id, concept_id, display_order) values (:lessonId, :conceptId, :displayOrder)", nativeQuery = true)
     void insertLessonConcept(Integer lessonId, Integer conceptId, short displayOrder);
 
+    @Modifying
+    @Query(
+            value = """
+                    update lessons
+                    set moderation_status = 'UNPUBLISHED'
+                    where contributor_id = :contributorId
+                      and deleted_at is null
+                    """,
+            nativeQuery = true
+    )
+    void unpublishByContributorId(@Param("contributorId") UUID contributorId);
+
     @Query(
             value = """
                     select l.*
