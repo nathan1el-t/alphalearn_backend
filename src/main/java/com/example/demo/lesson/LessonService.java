@@ -46,7 +46,7 @@ public class LessonService {
     }
 
     public List<LessonPublicSummaryDto>  findAllLessons() {
-        List<Lesson> lessons = lessonRepository.findAll();
+        List<Lesson> lessons = lessonRepository.findByLessonModerationStatusAndDeletedAtIsNull(LessonModerationStatus.APPROVED);
         return lessons.stream()
                 .map(this::toPublicSummaryDto)
                 .toList();
@@ -57,9 +57,13 @@ public class LessonService {
             List<Integer> conceptIds,
             String conceptsMatch
     ) {
+        if (!contributorRepository.existsById(contributorId)) {
+            return List.of();
+        }
+
         List<Lesson> lessons;
         if (conceptIds == null || conceptIds.isEmpty()) {
-            lessons = lessonRepository.findByContributor_ContributorId(contributorId);
+            lessons = lessonRepository.findByContributor_ContributorIdAndDeletedAtIsNull(contributorId);
         } else if ("any".equals(conceptsMatch)) {
             lessons = lessonRepository.findByContributorAndConceptIds(contributorId, conceptIds);
         } else {
@@ -102,12 +106,16 @@ public class LessonService {
     public LessonDetailView getLessonDetailForUser(Integer lessonId, SupabaseAuthUser user) {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
-        if (user != null && user.isContributor()
+        if (user != null && user.userId() != null
                 && lesson.getContributor() != null
-                && lesson.getContributor().getContributorId().equals(user.userId())) {
+                && lesson.getContributor().getContributorId().equals(user.userId())
+                && lesson.getDeletedAt() == null) {
             return toDetailDto(lesson);
         }
-        return toPublicDetailDto(lesson);
+
+        Lesson publicLesson = lessonRepository.findPublicById(lessonId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
+        return toPublicDetailDto(publicLesson);
     }
 
     @Transactional
@@ -202,6 +210,30 @@ public class LessonService {
         lesson.setLessonModerationStatus(LessonModerationStatus.UNPUBLISHED);
         Lesson saved = lessonRepository.save(lesson);
         return toDetailDto(saved);
+    }
+
+    @Transactional
+    public void softDeleteLesson(Integer lessonId, SupabaseAuthUser user) {
+        if (user == null || user.userId() == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Authenticated user required");
+        }
+
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
+        requireOwner(lesson, user);
+
+        if (lesson.getDeletedAt() != null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found");
+        }
+        if (lesson.getLessonModerationStatus() != LessonModerationStatus.UNPUBLISHED) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Only unpublished lessons can be deleted"
+            );
+        }
+
+        lesson.setDeletedAt(OffsetDateTime.now());
+        lessonRepository.save(lesson);
     }
 
     private String trimToNull(String value) {

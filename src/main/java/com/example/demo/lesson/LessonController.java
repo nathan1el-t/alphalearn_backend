@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,14 +56,14 @@ public class LessonController {
     }
 
     @GetMapping("/mine")
-    @Operation(summary = "List my lessons", description = "Contributor-only; optional concept filter")
+    @Operation(summary = "List my lessons", description = "Authenticated owner-only; optional concept filter")
     public List<LessonContributorSummaryDto> getMyLessons(
             @AuthenticationPrincipal SupabaseAuthUser user,
             @RequestParam(required = false) List<Integer> conceptIds,
             @RequestParam(defaultValue = "any") String conceptsMatch
     ) {
-        if (user == null || !user.isContributor()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Contributor access required");
+        if (user == null || user.userId() == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Authenticated user required");
         }
         UUID contributorId = user.userId();
         return lessonService.getLessonsByContributor(contributorId, conceptIds, conceptsMatch);
@@ -113,6 +114,16 @@ public class LessonController {
             @AuthenticationPrincipal SupabaseAuthUser user
     ) {
         return lessonService.unpublishLesson(lessonId, user);
+    }
+
+    @DeleteMapping("/{lessonId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Soft delete lesson", description = "Owner-only; lesson must be unpublished")
+    public void softDeleteLesson(
+            @PathVariable Integer lessonId,
+            @AuthenticationPrincipal SupabaseAuthUser user
+    ) {
+        lessonService.softDeleteLesson(lessonId, user);
     }
 
 }

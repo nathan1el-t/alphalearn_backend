@@ -9,8 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface LessonRepository extends JpaRepository<Lesson, Integer> {
-    List<Lesson> findByContributor_ContributorId(UUID contributorId);
+    List<Lesson> findByContributor_ContributorIdAndDeletedAtIsNull(UUID contributorId);
     boolean existsByContributor_ContributorId(UUID contributorId);
+    List<Lesson> findByLessonModerationStatusAndDeletedAtIsNull(com.example.demo.lesson.enums.LessonModerationStatus lessonModerationStatus);
 
     @Query(
             value = """
@@ -18,6 +19,8 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
                 from lessons l
                 join lesson_concepts lc on lc.lesson_id = l.lesson_id
                 where lc.concept_id in (:conceptIds)
+                  and l.moderation_status = 'APPROVED'
+                  and l.deleted_at is null
             """,
             nativeQuery = true
     )
@@ -29,6 +32,8 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
                 from lessons l 
                 join lesson_concepts lc on lc.lesson_id = l.lesson_id
                 where lc.concept_id in (:conceptIds)
+                  and l.moderation_status = 'APPROVED'
+                  and l.deleted_at is null
                 group by l.lesson_id
                 having count(distinct lc.concept_id) = :conceptCount
             """,
@@ -44,6 +49,7 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
                 from lessons l
                 join lesson_concepts lc on lc.lesson_id = l.lesson_id
                 where l.contributor_id = :contributorId
+                  and l.deleted_at is null
                   and lc.concept_id in (:conceptIds)
             """,
             nativeQuery = true
@@ -59,6 +65,7 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
                 from lessons l
                 join lesson_concepts lc on lc.lesson_id = l.lesson_id
                 where l.contributor_id = :contributorId
+                  and l.deleted_at is null
                   and lc.concept_id in (:conceptIds)
                 group by l.lesson_id
                 having count(distinct lc.concept_id) = :conceptCount
@@ -77,4 +84,28 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
     @Query(
             value = "insert into lesson_concepts (lesson_id, concept_id, display_order) values (:lessonId, :conceptId, :displayOrder)", nativeQuery = true)
     void insertLessonConcept(Integer lessonId, Integer conceptId, short displayOrder);
+
+    @Modifying
+    @Query(
+            value = """
+                    update lessons
+                    set moderation_status = 'UNPUBLISHED'
+                    where contributor_id = :contributorId
+                      and deleted_at is null
+                    """,
+            nativeQuery = true
+    )
+    void unpublishByContributorId(@Param("contributorId") UUID contributorId);
+
+    @Query(
+            value = """
+                    select l.*
+                    from lessons l
+                    where l.lesson_id = :lessonId
+                      and l.moderation_status = 'APPROVED'
+                      and l.deleted_at is null
+                    """,
+            nativeQuery = true
+    )
+    java.util.Optional<Lesson> findPublicById(@Param("lessonId") Integer lessonId);
 }

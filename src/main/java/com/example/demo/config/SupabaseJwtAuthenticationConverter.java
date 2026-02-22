@@ -45,7 +45,7 @@ public class SupabaseJwtAuthenticationConverter implements Converter<Jwt, Abstra
         if (userId != null) {
             learner = learnerRepository.findById(userId).orElse(null);
             contributor = contributorRepository.findById(userId).orElse(null);
-            if (contributor != null) {
+            if (contributor != null && contributor.isCurrentContributor()) {
                 authorities.add(new SimpleGrantedAuthority("ROLE_CONTRIBUTOR"));
             }
             if (adminRepository.existsById(userId)) {
