@@ -57,6 +57,10 @@ public class LessonService {
             List<Integer> conceptIds,
             String conceptsMatch
     ) {
+        if (!contributorRepository.existsById(contributorId)) {
+            return List.of();
+        }
+
         List<Lesson> lessons;
         if (conceptIds == null || conceptIds.isEmpty()) {
             lessons = lessonRepository.findByContributor_ContributorId(contributorId);
@@ -102,7 +106,7 @@ public class LessonService {
     public LessonDetailView getLessonDetailForUser(Integer lessonId, SupabaseAuthUser user) {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
-        if (user != null && user.isContributor()
+        if (user != null && user.userId() != null
                 && lesson.getContributor() != null
                 && lesson.getContributor().getContributorId().equals(user.userId())
                 && lesson.getDeletedAt() == null) {

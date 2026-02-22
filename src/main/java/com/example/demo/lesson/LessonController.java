@@ -55,14 +55,14 @@ public class LessonController {
     }
 
     @GetMapping("/mine")
-    @Operation(summary = "List my lessons", description = "Contributor-only; optional concept filter")
+    @Operation(summary = "List my lessons", description = "Authenticated owner-only; optional concept filter")
     public List<LessonContributorSummaryDto> getMyLessons(
             @AuthenticationPrincipal SupabaseAuthUser user,
             @RequestParam(required = false) List<Integer> conceptIds,
             @RequestParam(defaultValue = "any") String conceptsMatch
     ) {
-        if (user == null || !user.isContributor()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Contributor access required");
+        if (user == null || user.userId() == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Authenticated user required");
         }
         UUID contributorId = user.userId();
         return lessonService.getLessonsByContributor(contributorId, conceptIds, conceptsMatch);
