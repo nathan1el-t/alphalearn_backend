@@ -46,7 +46,7 @@ public class LessonService {
     }
 
     public List<LessonPublicSummaryDto>  findAllLessons() {
-        List<Lesson> lessons = lessonRepository.findAll();
+        List<Lesson> lessons = lessonRepository.findByLessonModerationStatusAndDeletedAtIsNull(LessonModerationStatus.APPROVED);
         return lessons.stream()
                 .map(this::toPublicSummaryDto)
                 .toList();
@@ -104,10 +104,14 @@ public class LessonService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
         if (user != null && user.isContributor()
                 && lesson.getContributor() != null
-                && lesson.getContributor().getContributorId().equals(user.userId())) {
+                && lesson.getContributor().getContributorId().equals(user.userId())
+                && lesson.getDeletedAt() == null) {
             return toDetailDto(lesson);
         }
-        return toPublicDetailDto(lesson);
+
+        Lesson publicLesson = lessonRepository.findPublicById(lessonId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
+        return toPublicDetailDto(publicLesson);
     }
 
     @Transactional
