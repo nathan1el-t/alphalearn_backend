@@ -8,7 +8,6 @@ import com.example.demo.lesson.dto.response.LessonDetailView;
 public record LessonDetailDto(
         Integer lessonId,
         String title,
-        String learningObjectives,
         Object content,
         String moderationStatus,
         UUID contributorId,

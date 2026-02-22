@@ -6,7 +6,6 @@ import java.util.UUID;
 public record LessonContributorSummaryDto(
         Integer lessonId,
         String title,
-        String learningObjectives,
         String moderationStatus,
         UUID contributorId,
         OffsetDateTime createdAt

@@ -27,8 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class LessonService {
 
-    private static final String LEARNING_OBJECTIVES_PLACEHOLDER = "to be deleted";
-
     private final LessonRepository lessonRepository;
     private final ContributorRepository contributorRepository;
     private final ConceptRepository conceptRepository;
@@ -148,7 +146,6 @@ public class LessonService {
         boolean submit = Boolean.TRUE.equals(request.submit());
         Lesson lesson = new Lesson(
                 title,
-                LEARNING_OBJECTIVES_PLACEHOLDER,
                 objectMapper.valueToTree(content),
                 submit ? LessonModerationStatus.PENDING : LessonModerationStatus.UNPUBLISHED,
                 contributor,
@@ -157,7 +154,7 @@ public class LessonService {
 
         Lesson saved = lessonRepository.save(lesson);
 
-        lessonRepository.insertLessonConcept(saved.getLessonId(), concept.getConceptId(), (short) 1);
+        lessonRepository.insertLessonConcept(saved.getLessonId(), concept.getConceptId());
 
         return toDetailDto(saved);
     }
@@ -183,7 +180,6 @@ public class LessonService {
         requireOwner(lesson, user);
 
         lesson.setTitle(title);
-        lesson.setLearningObjectives(LEARNING_OBJECTIVES_PLACEHOLDER);
         lesson.setContent(objectMapper.valueToTree(content));
 
         Lesson saved = lessonRepository.save(lesson);
@@ -248,7 +244,6 @@ public class LessonService {
         return new LessonPublicSummaryDto(
                 lesson.getLessonId(),
                 lesson.getTitle(),
-                LEARNING_OBJECTIVES_PLACEHOLDER,
                 lesson.getContributor().getContributorId(),
                 lesson.getCreatedAt()
         );
@@ -258,7 +253,6 @@ public class LessonService {
         return new LessonContributorSummaryDto(
                 lesson.getLessonId(),
                 lesson.getTitle(),
-                LEARNING_OBJECTIVES_PLACEHOLDER,
                 lesson.getLessonModerationStatus().name(),
                 lesson.getContributor().getContributorId(),
                 lesson.getCreatedAt()
@@ -270,7 +264,6 @@ public class LessonService {
         return new LessonDetailDto(
                 base.lessonId(),
                 base.title(),
-                base.learningObjectives(),
                 base.content(),
                 lesson.getLessonModerationStatus().name(),
                 base.contributorId(),
@@ -283,7 +276,6 @@ public class LessonService {
         return new LessonPublicDetailDto(
                 base.lessonId(),
                 base.title(),
-                base.learningObjectives(),
                 base.content(),
                 base.contributorId(),
                 base.createdAt()
@@ -294,7 +286,6 @@ public class LessonService {
         return new LessonDetailBase(
                 lesson.getLessonId(),
                 lesson.getTitle(),
-                LEARNING_OBJECTIVES_PLACEHOLDER,
                 objectMapper.convertValue(lesson.getContent(), Object.class),
                 lesson.getContributor().getContributorId(),
                 lesson.getCreatedAt()
@@ -304,7 +295,6 @@ public class LessonService {
     private record LessonDetailBase(
             Integer lessonId,
             String title,
-            String learningObjectives,
             Object content,
             UUID contributorId,
             OffsetDateTime createdAt
