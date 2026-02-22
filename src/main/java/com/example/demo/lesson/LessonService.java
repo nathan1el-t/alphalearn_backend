@@ -154,7 +154,7 @@ public class LessonService {
 
         Lesson saved = lessonRepository.save(lesson);
 
-        lessonRepository.insertLessonConcept(saved.getLessonId(), concept.getConceptId(), (short) 1);
+        lessonRepository.insertLessonConcept(saved.getLessonId(), concept.getConceptId());
 
         return toDetailDto(saved);
     }

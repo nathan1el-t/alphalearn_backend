@@ -82,8 +82,8 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
     // Replace with @ManyToMany after display_order is removed in DB.
     @Modifying
     @Query(
-            value = "insert into lesson_concepts (lesson_id, concept_id, display_order) values (:lessonId, :conceptId, :displayOrder)", nativeQuery = true)
-    void insertLessonConcept(Integer lessonId, Integer conceptId, short displayOrder);
+            value = "insert into lesson_concepts (lesson_id, concept_id) values (:lessonId, :conceptId)", nativeQuery = true)
+    void insertLessonConcept(Integer lessonId, Integer conceptId);
 
     @Modifying
     @Query(
